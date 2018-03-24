@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeD.Graphics.Animation", "PokeD.Graphics.Animation\PokeD.Graphics.Animation.csproj", "{F996DA56-3082-4828-82BE-90FBC1BE3B40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokeD.Graphics.Content.Pipeline.Animation", "PokeD.Graphics.Content.Pipeline.Animation\PokeD.Graphics.Content.Pipeline.Animation.csproj", "{04C74D24-3585-4F0E-A1AB-093A2E621131}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F996DA56-3082-4828-82BE-90FBC1BE3B40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F996DA56-3082-4828-82BE-90FBC1BE3B40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F996DA56-3082-4828-82BE-90FBC1BE3B40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F996DA56-3082-4828-82BE-90FBC1BE3B40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04C74D24-3585-4F0E-A1AB-093A2E621131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04C74D24-3585-4F0E-A1AB-093A2E621131}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04C74D24-3585-4F0E-A1AB-093A2E621131}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04C74D24-3585-4F0E-A1AB-093A2E621131}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C83E19F3-A3C6-4AF2-B21A-D46B9D9FB9D6}
+	EndGlobalSection
+EndGlobal

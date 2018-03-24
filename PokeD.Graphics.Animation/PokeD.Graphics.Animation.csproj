@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F996DA56-3082-4828-82BE-90FBC1BE3B40}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PokeD.Graphics</RootNamespace>
+    <AssemblyName>PokeD.Graphics.Animation</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Portable.3.6.0.1625\lib\portable-net45+win8+wpa81\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Content\ContentReaders\DefaultAnimatedDynamicVertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\DynamicIndexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\DynamicVertexBufferReader.cs" />
+    <Compile Include="Content\ContentReaders\MaterialAnimationsReader.cs" />
+    <Compile Include="Content\ContentReaders\MaterialClipReader.cs" />
+    <Compile Include="Content\ContentReaders\ModelAnimations.cs" />
+    <Compile Include="Content\ContentReaders\ModelAnimationsReader.cs" />
+    <Compile Include="Content\ContentReaders\SkeletalAnimationsReader.cs" />
+    <Compile Include="Content\ContentReaders\SkeletalClipReader.cs" />
+    <Compile Include="Extensions\ModelExtensions.cs" />
+    <Compile Include="MaterialAnimation\MaterialAnimations.cs" />
+    <Compile Include="MaterialAnimation\MaterialClip.cs" />
+    <Compile Include="MaterialAnimation\MaterialKeyframe.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SkeletalAnimation\AnimatedDynamicVertexBuffer.cs" />
+    <Compile Include="SkeletalAnimation\DefaultAnimatedDynamicVertexBuffer.cs" />
+    <Compile Include="SkeletalAnimation\SkeletalAnimations.cs" />
+    <Compile Include="SkeletalAnimation\SkeletalClip.cs" />
+    <Compile Include="SkeletalAnimation\SkeletalKeyframe.cs" />
+    <Compile Include="Vertices\DefaultCPUVertex.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
