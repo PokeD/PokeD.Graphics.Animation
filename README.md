@@ -10,8 +10,8 @@ Portion of code taken from [tainicom.Aether.Animation](https://github.com/tainic
   
   
 ## Example
--Import 3D model with 'GPU Animated Model' or 'GPU Animated Model' Processor.  
-Use 'SkinnedEffect' for GPU and 'BasicEffect' or 'AlphaTestEffect' for CPU based animation.
+-Import 3D model with [GPU Animated Model](https://github.com/PokeD/PokeD.Graphics.Animation/blob/master/PokeD.Graphics.Content.Pipeline.Animation/Processors/GPUAnimatedModelProcessor.cs) or [CPU Animated Model](https://github.com/PokeD/PokeD.Graphics.Animation/blob/master/PokeD.Graphics.Content.Pipeline.Animation/Processors/CPUAnimatedModelProcessor.cs) Processor.  
+Use [SkinnedEffect](https://github.com/MonoGame/MonoGame/blob/master/MonoGame.Framework/Graphics/Effect/SkinnedEffect.cs) for GPU and [BasicEffect](https://github.com/MonoGame/MonoGame/blob/master/MonoGame.Framework/Graphics/Effect/BasicEffect.cs) or [AlphaTestEffect](https://github.com/MonoGame/MonoGame/blob/master/MonoGame.Framework/Graphics/Effect/AlphaTestEffect.cs) for CPU based animation.
 
 -Load as any 3D Model:
 ```csharp
