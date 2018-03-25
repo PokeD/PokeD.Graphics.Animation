@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -47,44 +48,53 @@ namespace tainicom.Aether.Content.Pipeline.Processors
 
         public override SkeletalAnimationsContent Process(NodeContent input, ContentProcessorContext context)
         {
-            if(FixRealBoneRoot)
-                MGFixRealBoneRoot(input, context);
-
-            ValidateMesh(input, context, null);
-
-            // Find the skeleton.
-            var skeleton = MeshHelper.FindSkeleton(input);
-
-            if (skeleton == null)
-                throw new InvalidContentException("Input skeleton not found.");
-
-            // We don't want to have to worry about different parts of the model being
-            // in different local coordinate systems, so let's just bake everything.
-            FlattenTransforms(input, skeleton);
-
-            // Read the bind pose and skeleton hierarchy data.
-            var bones = MeshHelper.FlattenSkeleton(skeleton);
-
-            if (bones.Count > MaxBones)
-                throw new InvalidContentException($"Skeleton has {bones.Count} bones, but the maximum supported is {MaxBones}.");
-
-            var bindPose = new List<Matrix>();
-            var invBindPose = new List<Matrix>();
-            var skeletonHierarchy = new List<int>();
-            var boneNames = new List<string>();
-
-            foreach(var bone in bones)
+            context.Logger.LogMessage("Processing Skeletal Animation");
+            try
             {
-                bindPose.Add(bone.Transform);
-                invBindPose.Add(Matrix.Invert(bone.AbsoluteTransform));
-                skeletonHierarchy.Add(bones.IndexOf(bone.Parent as BoneContent));
-                boneNames.Add(bone.Name);
+                if (FixRealBoneRoot)
+                    MGFixRealBoneRoot(input, context);
+
+                ValidateMesh(input, context, null);
+
+                // Find the skeleton.
+                var skeleton = MeshHelper.FindSkeleton(input);
+
+                if (skeleton == null)
+                    throw new InvalidContentException("Input skeleton not found.");
+
+                // We don't want to have to worry about different parts of the model being
+                // in different local coordinate systems, so let's just bake everything.
+                FlattenTransforms(input, skeleton);
+
+                // Read the bind pose and skeleton hierarchy data.
+                var bones = MeshHelper.FlattenSkeleton(skeleton);
+
+                if (bones.Count > MaxBones)
+                    throw new InvalidContentException($"Skeleton has {bones.Count} bones, but the maximum supported is {MaxBones}.");
+
+                var bindPose = new List<Matrix>();
+                var invBindPose = new List<Matrix>();
+                var skeletonHierarchy = new List<int>();
+                var boneNames = new List<string>();
+
+                foreach (var bone in bones)
+                {
+                    bindPose.Add(bone.Transform);
+                    invBindPose.Add(Matrix.Invert(bone.AbsoluteTransform));
+                    skeletonHierarchy.Add(bones.IndexOf(bone.Parent as BoneContent));
+                    boneNames.Add(bone.Name);
+                }
+
+                // Convert animation data to our runtime format.
+                var clips = ProcessAnimations(input, context, skeleton.Animations, bones, GenerateKeyframesFrequency);
+
+                return new SkeletalAnimationsContent(bindPose, invBindPose, skeletonHierarchy, boneNames, clips);
             }
-
-            // Convert animation data to our runtime format.
-            var clips = ProcessAnimations(input, context, skeleton.Animations, bones, GenerateKeyframesFrequency);
-
-            return new SkeletalAnimationsContent(bindPose, invBindPose, skeletonHierarchy, boneNames, clips);
+            catch (Exception ex)
+            {
+                context.Logger.LogMessage("Error {0}", ex);
+                throw;
+            }
         }
         
         /// <summary>
@@ -138,46 +148,31 @@ namespace tainicom.Aether.Content.Pipeline.Processors
             {
                 // Validate the mesh.
                 if (parentBoneName != null)
-                {
-                    context.Logger.LogWarning(null, null, "Mesh {0} is a child of bone {1}. AnimatedModelProcessor " + "does not correctly handle meshes that are children of bones.",
-                        mesh.Name, parentBoneName);
-                }
+                    context.Logger.LogWarning(null, null, $"Mesh {mesh.Name} is a child of bone {parentBoneName}. AnimatedModelProcessor does not correctly handle meshes that are children of bones.");
 
                 if (!MeshHasSkinning(mesh))
                 {
-                    context.Logger.LogWarning(null, null, "Mesh {0} has no skinning information, so it has been deleted.", mesh.Name);
+                    context.Logger.LogWarning(null, null, $"Mesh {mesh.Name} has no skinning information, so it has been deleted.");
 
                     mesh.Parent.Children.Remove(mesh);
                     return;
                 }
             }
             else if (node is BoneContent)
-            {
-                // If this is a bone, remember that we are now looking inside it.
-                parentBoneName = node.Name;
-            }
+                parentBoneName = node.Name; // If this is a bone, remember that we are now looking inside it.
 
             // Recurse (iterating over a copy of the child collection,
             // because validating children may delete some of them).
             foreach (var child in new List<NodeContent>(node.Children))
                 ValidateMesh(child, context, parentBoneName);
         }
-        
+
         /// <summary>
         /// Checks whether a mesh contains skininng information.
         /// </summary>
-        private static bool MeshHasSkinning(MeshContent mesh)
-        {
-            foreach (var geometry in mesh.Geometry)
-            {
-                if (!geometry.Vertices.Channels.Contains(VertexChannelNames.Weights()) &&
-                    !geometry.Vertices.Channels.Contains("BlendWeight0"))
-                    return false;
-            }
+        private static bool MeshHasSkinning(MeshContent mesh) => 
+            mesh.Geometry.All(geometry => geometry.Vertices.Channels.Contains(VertexChannelNames.Weights()) || geometry.Vertices.Channels.Contains("BlendWeight0"));
 
-            return true;
-        }
-        
         /// <summary>
         /// Bakes unwanted transforms into the model geometry,
         /// so everything ends up in the same coordinate system.
@@ -230,10 +225,7 @@ namespace tainicom.Aether.Content.Pipeline.Processors
             }
 
             if (animationClips.Count == 0)
-            {
-                //throw new InvalidContentException("Input file does not contain any animations.");
                 context.Logger.LogWarning(null, null, "Input file does not contain any animations.");
-            }
 
             return animationClips;
         }
@@ -285,7 +277,6 @@ namespace tainicom.Aether.Content.Pipeline.Processors
             var cmpTime = a.Time.CompareTo(b.Time);
             if (cmpTime == 0)
                 return a.Bone.CompareTo(b.Bone);
-
             return cmpTime;
         }
 
@@ -317,8 +308,8 @@ namespace tainicom.Aether.Content.Pipeline.Processors
             }
 
             //            
-            System.Diagnostics.Debug.WriteLine("Duration: " + duration);
-            System.Diagnostics.Debug.WriteLine("keyframeCount: " + keyframeCount);
+            System.Diagnostics.Debug.WriteLine($"Duration: {duration}");
+            System.Diagnostics.Debug.WriteLine($"keyframeCount: {keyframeCount}" );
 
             for (var b = 0; b < boneFrames.Length; b++)
             {
@@ -349,15 +340,15 @@ namespace tainicom.Aether.Content.Pipeline.Processors
         private static List<SkeletalKeyframeContent> InterpolateFramesBone(int bone, List<SkeletalKeyframeContent> frames, TimeSpan keySpan)
         {
             System.Diagnostics.Debug.WriteLine("");
-            System.Diagnostics.Debug.WriteLine("Bone: " + bone);
+            System.Diagnostics.Debug.WriteLine($"Bone: {bone}");
             if (frames == null)
             {
-                System.Diagnostics.Debug.WriteLine("Frames: " + "null");
+                System.Diagnostics.Debug.WriteLine("Frames: null");
                 return frames;
             }
-            System.Diagnostics.Debug.WriteLine("Frames: " + frames.Count);
-            System.Diagnostics.Debug.WriteLine("MinTime: " + frames[0].Time);
-            System.Diagnostics.Debug.WriteLine("MaxTime: " + frames[frames.Count - 1].Time);
+            System.Diagnostics.Debug.WriteLine($"Frames: {frames.Count}");
+            System.Diagnostics.Debug.WriteLine($"MinTime: {frames[0].Time}");
+            System.Diagnostics.Debug.WriteLine($"MaxTime: {frames[frames.Count - 1].Time}");
 
             for (var i = 0; i < frames.Count - 1; ++i)
                 InterpolateFrames(bone, frames, keySpan, i);

@@ -14,6 +14,7 @@
 //   limitations under the License.
 #endregion
 
+using System;
 using System.ComponentModel;
 
 using Microsoft.Xna.Framework.Content.Pipeline;
@@ -42,26 +43,35 @@ namespace tainicom.Aether.Content.Pipeline.Processors
 
         public override ModelContent Process(NodeContent input, ContentProcessorContext context)
         {
-            var skeletalAnimationsProcessor = new SkeletalAnimationsProcessor
+            context.Logger.LogMessage("Processing CPU Animated Model");
+            try
             {
-                MaxBones = MaxBones,
-                GenerateKeyframesFrequency = GenerateKeyframesFrequency,
-                FixRealBoneRoot = FixRealBoneRoot
-            };
-            var skeletalAnimations = skeletalAnimationsProcessor.Process(input, context);
+                var skeletalAnimationsProcessor = new SkeletalAnimationsProcessor
+                {
+                    MaxBones = MaxBones,
+                    GenerateKeyframesFrequency = GenerateKeyframesFrequency,
+                    FixRealBoneRoot = FixRealBoneRoot
+                };
+                var skeletalAnimations = skeletalAnimationsProcessor.Process(input, context);
 
-            var materalAnimationsProcessor = new MaterialAnimationsProcessor();
-            var materalAnimations = materalAnimationsProcessor.Process(input, context);
+                var materalAnimationsProcessor = new MaterialAnimationsProcessor();
+                var materalAnimations = materalAnimationsProcessor.Process(input, context);
 
 
-            var model = base.Process(input, context);
-            model.Tag = new ModelAnimationsContent()
+                var model = base.Process(input, context);
+                model.Tag = new ModelAnimationsContent()
+                {
+                    Identity = input.Identity,
+                    SkeletalAnimations = skeletalAnimations,
+                    MaterialAnimations = materalAnimations
+                };
+                return model;
+            }
+            catch (Exception ex)
             {
-                Identity = input.Identity,
-                SkeletalAnimations = skeletalAnimations,
-                MaterialAnimations = materalAnimations
-            };
-            return model;
+                context.Logger.LogMessage("Error {0}", ex);
+                throw;
+            }
         }
     }
 }

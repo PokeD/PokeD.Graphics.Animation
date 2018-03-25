@@ -44,19 +44,28 @@ namespace tainicom.Aether.Content.Pipeline.Serialization
 
         object IContentProcessor.Process(object input, ContentProcessorContext context)
         {
-            var model = Process(input as NodeContent, context);
-            var dynamicModel = new DynamicModelContent(model);
-            
-            foreach(var mesh in dynamicModel.Meshes)
+            context.Logger.LogMessage("Processing Dynamic Model");
+            try
             {
-                foreach(var part in mesh.MeshParts)
-                {
-                    ProcessVertexBuffer(dynamicModel, context, part);
-                    ProcessIndexBuffer(dynamicModel, context, part);
-                }
-            }
+                var model = Process(input as NodeContent, context);
+                var dynamicModel = new DynamicModelContent(model);
 
-            return dynamicModel;
+                foreach (var mesh in dynamicModel.Meshes)
+                {
+                    foreach (var part in mesh.MeshParts)
+                    {
+                        ProcessVertexBuffer(dynamicModel, context, part);
+                        ProcessIndexBuffer(dynamicModel, context, part);
+                    }
+                }
+
+                return dynamicModel;
+            }
+            catch (Exception ex)
+            {
+                context.Logger.LogMessage("Error {0}", ex);
+                throw;
+            }
         }
 
         protected virtual void ProcessVertexBuffer(DynamicModelContent dynamicModel, ContentProcessorContext context, DynamicModelMeshPartContent part)
@@ -73,7 +82,6 @@ namespace tainicom.Aether.Content.Pipeline.Serialization
                 part.VertexBuffer = vb;
             }
         }
-
         protected virtual void ProcessIndexBuffer(DynamicModelContent dynamicModel, ContentProcessorContext context, DynamicModelMeshPartContent part)
         {
             if(IndexBufferType != DynamicModelContent.BufferType.Default)

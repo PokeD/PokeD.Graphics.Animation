@@ -22,15 +22,24 @@ namespace PokeD.Graphics.Content.Pipeline.Processors
 
         public override MaterialAnimationsContent Process(NodeContent input, ContentProcessorContext context)
         {
-            // Gather all the nodes in tree traversal order.
-            var nodes = input.AsEnumerable().SelectDeep(n => n.Children).ToList();
+            context.Logger.LogMessage("Processing Material Animation");
+            try
+            {
+                // Gather all the nodes in tree traversal order.
+                var nodes = input.AsEnumerable().SelectDeep(n => n.Children).ToList();
 
-            var materialAnimations = nodes.FindAll(n => n is MaterialAnimationContent).Cast<MaterialAnimationContent>().ToList();
-            
+                var materialAnimations = nodes.FindAll(n => n is MaterialAnimationContent).Cast<MaterialAnimationContent>().ToList();
 
-            var clips = ProcessAnimations(input, context, materialAnimations, GenerateKeyframesFrequency);
 
-            return new MaterialAnimationsContent(clips);
+                var clips = ProcessAnimations(input, context, materialAnimations, GenerateKeyframesFrequency);
+
+                return new MaterialAnimationsContent(clips);
+            }
+            catch (Exception ex)
+            {
+                context.Logger.LogMessage("Error {0}", ex);
+                throw;
+            }
         }
 
         private static Dictionary<string, MaterialClipContent> ProcessAnimations(NodeContent input, ContentProcessorContext context, List<MaterialAnimationContent> animations, int generateKeyframesFrequency)
@@ -46,10 +55,7 @@ namespace PokeD.Graphics.Content.Pipeline.Processors
             }
 
             if (animationClips.Count == 0)
-            {
-                //throw new InvalidContentException("Input file does not contain any animations.");
                 context.Logger.LogWarning(null, null, "Input file does not contain any material animations.");
-            }
 
             return animationClips;
         }

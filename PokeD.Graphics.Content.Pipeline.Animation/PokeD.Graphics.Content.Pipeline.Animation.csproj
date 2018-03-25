@@ -57,12 +57,10 @@
     <Compile Include="Processors\ModelAnimationsContent.cs" />
     <Compile Include="Processors\SkeletalAnimationsProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Serialization\AnimatedDynamicVertexBufferContent.cs" />
     <Compile Include="Serialization\DefaultAnimatedDynamicVertexBufferWriter.cs" />
     <Compile Include="Serialization\DynamicIndexBufferWriter.cs" />
     <Compile Include="Serialization\DynamicModelWriter.cs" />
     <Compile Include="Serialization\DynamicVertexBufferWriter.cs" />
-    <Compile Include="Serialization\AnimatedDynamicVertexBufferWriter.cs" />
     <Compile Include="Serialization\MaterialClipWriter.cs" />
     <Compile Include="Serialization\MaterialAnimationsWriter.cs" />
     <Compile Include="Serialization\ModelAnimationsWriter.cs" />

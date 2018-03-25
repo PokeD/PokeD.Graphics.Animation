@@ -14,6 +14,7 @@
 //   limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -59,36 +60,45 @@ namespace tainicom.Aether.Content.Pipeline.Processors
 
         object IContentProcessor.Process(object input, ContentProcessorContext context)
         {
-            var model = base.Process((NodeContent) input, context);
-            var outputModel = new DynamicModelContent(model);
-            
-            foreach(var mesh in outputModel.Meshes)
+            context.Logger.LogMessage("Processing CPU Animated Model");
+            try
             {
-                foreach(var part in mesh.MeshParts)
+                var model = base.Process((NodeContent)input, context);
+                var outputModel = new DynamicModelContent(model);
+
+                foreach (var mesh in outputModel.Meshes)
                 {
-                    ProcessVertexBuffer(outputModel, context, part);
-                    ProcessIndexBuffer(outputModel, context, part);
+                    foreach (var part in mesh.MeshParts)
+                    {
+                        ProcessVertexBuffer(outputModel, context, part);
+                        ProcessIndexBuffer(outputModel, context, part);
+                    }
                 }
+
+                var skeletalAnimationsProcessor = new SkeletalAnimationsProcessor
+                {
+                    MaxBones = MaxBones,
+                    GenerateKeyframesFrequency = GenerateKeyframesFrequency,
+                    FixRealBoneRoot = FixRealBoneRoot
+                };
+                var skeletalAnimations = skeletalAnimationsProcessor.Process((NodeContent)input, context);
+
+                var materalAnimationsProcessor = new MaterialAnimationsProcessor();
+                var materalAnimations = materalAnimationsProcessor.Process((NodeContent)input, context);
+
+                outputModel.Tag = new ModelAnimationsContent()
+                {
+                    Identity = ((NodeContent)input).Identity,
+                    SkeletalAnimations = skeletalAnimations,
+                    MaterialAnimations = materalAnimations
+                };
+                return outputModel;
             }
-
-            var skeletalAnimationsProcessor = new SkeletalAnimationsProcessor
+            catch (Exception ex)
             {
-                MaxBones = MaxBones,
-                GenerateKeyframesFrequency = GenerateKeyframesFrequency,
-                FixRealBoneRoot = FixRealBoneRoot
-            };
-            var skeletalAnimations = skeletalAnimationsProcessor.Process((NodeContent) input, context);
-
-            var materalAnimationsProcessor = new MaterialAnimationsProcessor();
-            var materalAnimations = materalAnimationsProcessor.Process((NodeContent) input, context);
-
-            outputModel.Tag = new ModelAnimationsContent()
-            {
-                Identity = ((NodeContent) input).Identity,
-                SkeletalAnimations = skeletalAnimations,
-                MaterialAnimations = materalAnimations
-            };
-            return outputModel;
+                context.Logger.LogMessage("Error {0}", ex);
+                throw;
+            }
         }
 
         protected override void ProcessVertexBuffer(DynamicModelContent dynamicModel, ContentProcessorContext context, DynamicModelMeshPartContent part)
