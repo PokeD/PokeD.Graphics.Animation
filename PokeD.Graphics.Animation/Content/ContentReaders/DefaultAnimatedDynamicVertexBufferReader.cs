@@ -60,10 +60,20 @@ namespace tainicom.Aether.Graphics.Content
                             gpuVertices[i].Normal = nor;
                             break;
 
-                        //case VertexElementUsage.Color:
-                        //    System.Diagnostics.Debug.Assert(channel.VertexElementFormat == VertexElementFormat.Color);
-                        //    var col = input.ReadColor();
-                        //    break;
+                        case VertexElementUsage.Color:
+                            System.Diagnostics.Debug.Assert(channel.VertexElementFormat == VertexElementFormat.Color);
+                            var col = input.ReadColor();
+                            break;
+
+                        case VertexElementUsage.Tangent:
+                            System.Diagnostics.Debug.Assert(channel.VertexElementFormat == VertexElementFormat.Vector3);
+                            var tan = input.ReadVector3();
+                            break;
+
+                        case VertexElementUsage.Binormal:
+                            System.Diagnostics.Debug.Assert(channel.VertexElementFormat == VertexElementFormat.Vector3);
+                            var bin = input.ReadVector3();
+                            break;
 
                         case VertexElementUsage.TextureCoordinate:
                             System.Diagnostics.Debug.Assert(channel.VertexElementFormat == VertexElementFormat.Vector2);
