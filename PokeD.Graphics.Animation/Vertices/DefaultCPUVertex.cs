@@ -48,6 +48,17 @@ namespace tainicom.Aether.Graphics
             BlendWeights = blendWeights;
         }
 
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Position.GetHashCode() * 397) ^
+                       Normal.GetHashCode() ^
+                       BlendIndices.GetHashCode() ^
+                       BlendWeights.GetHashCode();
+            }
+        }
+
         public override string ToString() =>
             $"{{Position:{Position} Normal:{Normal} BlendIndices:{BlendIndices} BlendWeights:{BlendWeights}}}";
 
